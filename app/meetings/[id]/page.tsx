@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import type { SacramentMeeting } from '@/lib/types';
 
 async function getMeeting(id: string): Promise<SacramentMeeting | null> {
-    const res = await fetch(`http://localhost:3000/api/meetings`, { cache: 'no-store' });
+    const res = await fetch('/api/meetings', { cache: 'no-store' });
     if (!res.ok) return null;
     const meetings: SacramentMeeting[] = await res.json();
     return meetings.find((m) => String(m.id) === String(id) || String((m as any)._id) === String(id)) || meetings[0] || null;
