@@ -3,7 +3,7 @@ import type { SacramentMeeting } from '@/lib/types';
 
 async function getMeetingsData(): Promise<SacramentMeeting[]> {
     // Fetching from our local API route
-    const res = await fetch('http://localhost:3000/api/meetings', { cache: 'no-store' });
+    const res = await fetch('/api/meetings', { cache: 'no-store' });
     if (!res.ok) {
         throw new Error('Failed to fetch meetings');
     }
