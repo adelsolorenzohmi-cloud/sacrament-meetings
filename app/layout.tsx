@@ -1,4 +1,3 @@
-import "./globals.css";
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
@@ -20,8 +19,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} bg-gray-50 text-gray-900 min-h-screen flex flex-col`}>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded focus:bg-white focus:px-4 focus:py-2 focus:text-blue-700"
+        >
+          Skip to main content
+        </a>
         <Header />
-        <main className="flex-grow max-w-5xl w-full mx-auto px-4 py-8">
+        <main id="main-content" className="flex-grow max-w-5xl w-full mx-auto px-4 py-8">
           {children}
         </main>
         <Footer />

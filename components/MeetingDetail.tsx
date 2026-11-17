@@ -1,13 +1,23 @@
+'use client';
+
 import type { SacramentMeeting } from '@/lib/types';
 
+function hasContent(value: string | null): value is string {
+    if (!value) return false;
+    const text = value.trim().toLowerCase();
+    return text !== '' && text !== 'none';
+}
+
 export default function MeetingDetail({ meeting }: { meeting: SacramentMeeting }) {
+    const speakers = meeting.speakers ?? [];
+
     return (
         <div className="bg-white border rounded-xl shadow-sm p-6 sm:p-10 max-w-3xl mx-auto print:shadow-none print:border-none">
             <div className="text-center border-b pb-6 mb-6">
                 <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Central Ward Sacrament Meeting</h1>
                 <p className="text-gray-600 mt-1 font-medium">{meeting.date}</p>
                 <span className="inline-block mt-3 text-xs uppercase tracking-wider font-semibold px-3 py-1 bg-blue-50 text-blue-700 rounded-full">
-                    {meeting.meetingType} meeting
+                    {meeting.meetingType}
                 </span>
             </div>
 
@@ -23,7 +33,7 @@ export default function MeetingDetail({ meeting }: { meeting: SacramentMeeting }
             <div className="space-y-6 text-gray-800">
                 <div className="flex justify-between items-center border-b pb-3">
                     <span className="font-semibold">Opening Hymn</span>
-                    <span className="text-right">#{meeting.openingHymn.number} &ndash; {meeting.openingHymn.title}</span>
+                    <span className="text-right">Hymn #{meeting.openingHymn}</span>
                 </div>
 
                 <div className="flex justify-between items-center border-b pb-3">
@@ -31,52 +41,45 @@ export default function MeetingDetail({ meeting }: { meeting: SacramentMeeting }
                     <span>{meeting.openingPrayer}</span>
                 </div>
 
-                {meeting.wardBusiness.length > 0 && (
+                {hasContent(meeting.wardBusiness) && (
                     <div className="border-b pb-3">
-                        <h3 className="font-semibold mb-2">Ward Business</h3>
-                        <ul className="list-disc list-inside space-y-1 text-sm text-gray-600">
-                            {meeting.wardBusiness.map((item, index) => (
-                                <li key={index}>{item.description}</li>
-                            ))}
-                        </ul>
+                        <h2 className="font-semibold mb-2">Ward Business</h2>
+                        <p className="text-sm text-gray-700 whitespace-pre-line">{meeting.wardBusiness}</p>
+                    </div>
+                )}
+
+                {hasContent(meeting.stakeBusiness) && (
+                    <div className="border-b pb-3">
+                        <h2 className="font-semibold mb-2">Stake Business</h2>
+                        <p className="text-sm text-gray-700 whitespace-pre-line">{meeting.stakeBusiness}</p>
                     </div>
                 )}
 
                 <div className="flex justify-between items-center border-b pb-3">
                     <span className="font-semibold">Sacrament Hymn</span>
-                    <span className="text-right">#{meeting.sacramentHymn.number} &ndash; {meeting.sacramentHymn.title}</span>
+                    <span className="text-right">Hymn #{meeting.sacramentHymn}</span>
                 </div>
 
-                <div className="text-center py-2 text-xs uppercase tracking-widest text-gray-400 font-semibold">
+                <div className="text-center py-2 text-xs uppercase tracking-widest text-gray-600 font-semibold">
                     Administration of the Sacrament
                 </div>
 
-                {meeting.speakers.length > 0 ? (
-                    <div className="border-b pb-3">
-                        <h3 className="font-semibold mb-3">Speakers</h3>
-                        <div className="space-y-3">
-                            {meeting.speakers.map((speaker, index) => (
-                                <div key={index} className="flex justify-between items-start text-sm">
-                                    <div>
-                                        <p className="font-medium">{speaker.name}</p>
-                                        {speaker.topic && <p className="text-xs text-gray-500">{speaker.topic}</p>}
-                                    </div>
-                                    <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
-                                        {speaker.type}
-                                    </span>
-                                </div>
+                <div className="border-b pb-3">
+                    <h2 className="font-semibold mb-3">Speakers</h2>
+                    {speakers.length > 0 ? (
+                        <ul className="space-y-2 text-sm">
+                            {speakers.map((name, index) => (
+                                <li key={`${name}-${index}`}>{name}</li>
                             ))}
-                        </div>
-                    </div>
-                ) : (
-                    <div className="border-b pb-3 text-center text-sm text-gray-500 italic">
-                        Testimony Meeting &ndash; Open Microphone for Congregation
-                    </div>
-                )}
+                        </ul>
+                    ) : (
+                        <p className="text-sm text-gray-600 italic">No speakers scheduled.</p>
+                    )}
+                </div>
 
                 <div className="flex justify-between items-center border-b pb-3">
                     <span className="font-semibold">Closing Hymn</span>
-                    <span className="text-right">#{meeting.closingHymn.number} &ndash; {meeting.closingHymn.title}</span>
+                    <span className="text-right">Hymn #{meeting.closingHymn}</span>
                 </div>
 
                 <div className="flex justify-between items-center border-b pb-3">
@@ -84,22 +87,19 @@ export default function MeetingDetail({ meeting }: { meeting: SacramentMeeting }
                     <span>{meeting.closingPrayer}</span>
                 </div>
 
-                {meeting.announcements && meeting.announcements.length > 0 && (
+                {hasContent(meeting.announcements) && (
                     <div className="mt-6 bg-blue-50/50 border border-blue-100 p-4 rounded-lg">
-                        <h3 className="font-semibold text-blue-900 mb-2">Announcements</h3>
-                        <ul className="list-disc list-inside space-y-1 text-sm text-blue-800">
-                            {meeting.announcements.map((ann, idx) => (
-                                <li key={idx}>{ann}</li>
-                            ))}
-                        </ul>
+                        <h2 className="font-semibold text-blue-900 mb-2">Announcements</h2>
+                        <p className="text-sm text-blue-900 whitespace-pre-line">{meeting.announcements}</p>
                     </div>
                 )}
             </div>
 
             <div className="mt-8 pt-6 border-t flex justify-end print:hidden">
                 <button
+                    type="button"
                     onClick={() => window.print()}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                    className="bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800 transition-colors"
                 >
                     Print Program
                 </button>

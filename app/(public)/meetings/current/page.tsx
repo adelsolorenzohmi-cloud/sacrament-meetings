@@ -1,25 +1,16 @@
 import { redirect } from 'next/navigation';
-import type { SacramentMeeting } from '@/lib/types';
+import { connection } from 'next/server';
+import { getMeetings } from '@/lib/meetings-db';
 
 export default async function CurrentMeetingPage() {
-    const baseUrl = process.env.VERCEL_URL
-        ? `https://${process.env.VERCEL_URL}`
-        : 'http://localhost:3000';
 
-    const res = await fetch(`${baseUrl}/api/meetings`, { cache: 'no-store' });
-    if (!res.ok) redirect('/meetings');
-    const meetings: SacramentMeeting[] = await res.json();
+    await connection();
 
-    if (!meetings || meetings.length === 0) {
+    const [latest] = await getMeetings('', 1);
+
+    if (!latest) {
         redirect('/meetings');
     }
 
-    const target = meetings[0];
-    const meetingId = (target as any).id || (target as any)._id;
-
-    if (meetingId) {
-        redirect(`/meetings/${meetingId}`);
-    }
-
-    redirect('/meetings');
+    redirect(`/meetings/${latest.id}`);
 }

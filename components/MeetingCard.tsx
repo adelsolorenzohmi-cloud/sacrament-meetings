@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import { deleteMeeting } from '@/lib/actions';
+import DeleteMeetingButton from '@/components/DeleteMeetingButton';
 import type { SacramentMeeting } from '@/lib/types';
 
 export default function MeetingCard({ meeting }: { meeting: SacramentMeeting }) {
@@ -19,12 +21,24 @@ export default function MeetingCard({ meeting }: { meeting: SacramentMeeting }) 
                     <span className="font-medium">Conducting:</span> {meeting.conducting}
                 </p>
             </div>
-            <div className="mt-4 pt-3 border-t flex justify-end">
+
+            <div className="mt-4 pt-3 border-t flex items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                    <Link
+                        href={`/meetings/${meeting.id}/edit`}
+                        className="text-sm font-semibold text-gray-700 hover:text-gray-900"
+                    >
+                        Edit<span className="sr-only"> meeting on {meeting.date}</span>
+                    </Link>
+                    <form action={deleteMeeting.bind(null, meeting.id)}>
+                        <DeleteMeetingButton meetingDate={meeting.date} />
+                    </form>
+                </div>
                 <Link
                     href={`/meetings/${meeting.id}`}
-                    className="text-sm font-semibold text-blue-600 hover:text-blue-800"
+                    className="text-sm font-semibold text-blue-700 hover:text-blue-900"
                 >
-                    View Program &rarr;
+                    View Program<span className="sr-only"> for {meeting.date}</span> &rarr;
                 </Link>
             </div>
         </div>

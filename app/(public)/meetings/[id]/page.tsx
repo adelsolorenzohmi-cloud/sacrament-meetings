@@ -1,33 +1,43 @@
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import type { SacramentMeeting } from '@/lib/types';
+import MeetingDetail from '@/components/MeetingDetail';
+import { getMeetingById } from '@/lib/meetings-db';
 
-async function getMeeting(id: string): Promise<SacramentMeeting | null> {
-    const baseUrl = process.env.VERCEL_URL
-        ? `https://${process.env.VERCEL_URL}`
-        : 'http://localhost:3000';
+export default async function MeetingDetailPage({
+    params,
+}: {
+    params: Promise<{ id: string }>;
+}) {
+    const { id: idParam } = await params;
+    const id = Number(idParam);
 
-    const res = await fetch(`${baseUrl}/api/meetings`, { cache: 'no-store' });
-    if (!res.ok) return null;
-    const meetings: SacramentMeeting[] = await res.json();
-    return meetings.find((m) => String(m.id) === String(id) || String((m as any)._id) === String(id)) || meetings[0] || null;
-}
+    if (!Number.isInteger(id) || id < 1 || id > 2147483647) {
+        notFound();
+    }
 
-export default async function MeetingDetailPage({ params }: { params: Promise<{ id: string }> }) {
-    const { id } = await params;
-    const meeting = await getMeeting(id);
+    const meeting = await getMeetingById(id);
 
     if (!meeting) {
         notFound();
     }
 
     return (
-        <main className="max-w-4xl mx-auto px-4 py-8">
-            <h1 className="text-3xl font-bold mb-2">Sacrament Meeting Program</h1>
-            <p className="text-gray-600 mb-6">{meeting.date} {meeting.meetingType}</p>
-            <div className="bg-white shadow rounded-lg p-6 space-y-4">
-                <div><strong>Presiding:</strong> {meeting.presiding}</div>
-                <div><strong>Conducting:</strong> {meeting.conducting}</div>
+        <div className="space-y-4">
+            <div className="flex items-center justify-between print:hidden">
+                <Link
+                    href="/meetings"
+                    className="text-sm font-semibold text-blue-700 hover:text-blue-900"
+                >
+                    &larr; All meetings
+                </Link>
+                <Link
+                    href={`/meetings/${meeting.id}/edit`}
+                    className="text-sm font-semibold text-gray-700 hover:text-gray-900"
+                >
+                    Edit meeting
+                </Link>
             </div>
-        </main>
+            <MeetingDetail meeting={meeting} />
+        </div>
     );
 }
