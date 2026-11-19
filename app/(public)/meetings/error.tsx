@@ -19,7 +19,7 @@ export default function MeetingsError({
             role="alert"
             className="bg-white border rounded-xl shadow-sm p-6 sm:p-10 max-w-3xl mx-auto text-center"
         >
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Something went wrong</h3>
+            <h1 className="text-xl font-bold text-gray-900 mb-2">Something went wrong</h1>
             <p className="text-gray-600 mb-6">
                 We couldn&apos;t complete that request. Please try again, or go back to the
                 list of meetings.

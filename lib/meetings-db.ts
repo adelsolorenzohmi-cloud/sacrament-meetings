@@ -8,13 +8,13 @@ const ITEMS_PER_PAGE = 5;
 export type MeetingInput = Omit<SacramentMeeting, 'id'>;
 
 export async function getMeetings(
-    query: string = '',
-    currentPage: number = 1
+  query: string = '',
+  currentPage: number = 1
 ): Promise<SacramentMeeting[]> {
-    const searchTerm = `%${query}%`;
-    const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+  const searchTerm = `%${query.replace(/[\\%_]/g, '\\$&')}%`;
+  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
-    const rows = await sql`
+  const rows = await sql`
     SELECT
       id,
       to_char(date, 'YYYY-MM-DD') AS "date",
@@ -37,14 +37,14 @@ export async function getMeetings(
     ORDER BY date DESC
     LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
   `;
-    return rows as unknown as SacramentMeeting[];
+  return rows as unknown as SacramentMeeting[];
 }
 
 export async function getMeetingsTotalPages(
-    query: string = ''
+  query: string = ''
 ): Promise<number> {
-    const searchTerm = `%${query}%`;
-    const rows = await sql`
+  const searchTerm = `%${query.replace(/[\\%_]/g, '\\$&')}%`;
+  const rows = await sql`
     SELECT COUNT(*) FROM meetings
     WHERE
       presiding      ILIKE ${searchTerm}
@@ -52,13 +52,13 @@ export async function getMeetingsTotalPages(
       OR meeting_type ILIKE ${searchTerm}
       OR speakers::text ILIKE ${searchTerm}
   `;
-    return Math.ceil(Number(rows[0].count) / ITEMS_PER_PAGE);
+  return Math.ceil(Number(rows[0].count) / ITEMS_PER_PAGE);
 }
 
 export async function getMeetingById(
-    id: number
+  id: number
 ): Promise<SacramentMeeting | null> {
-    const rows = await sql`
+  const rows = await sql`
     SELECT
       id,
       to_char(date, 'YYYY-MM-DD') AS "date",
@@ -74,13 +74,13 @@ export async function getMeetingById(
       closing_prayer              AS "closingPrayer"
     FROM meetings WHERE id = ${id}
   `;
-    return (rows[0] as unknown as SacramentMeeting) ?? null;
+  return (rows[0] as unknown as SacramentMeeting) ?? null;
 }
 
 export async function addMeeting(
-    data: MeetingInput
+  data: MeetingInput
 ): Promise<SacramentMeeting> {
-    const rows = await sql`
+  const rows = await sql`
     INSERT INTO meetings (
       date, meeting_type, presiding, conducting, announcements,
       opening_hymn, opening_prayer, ward_business, stake_business,
@@ -115,14 +115,14 @@ export async function addMeeting(
       closing_hymn                AS "closingHymn",
       closing_prayer              AS "closingPrayer"
   `;
-    return rows[0] as unknown as SacramentMeeting;
+  return rows[0] as unknown as SacramentMeeting;
 }
 
 export async function updateMeeting(
-    id: number,
-    data: MeetingInput
+  id: number,
+  data: MeetingInput
 ): Promise<SacramentMeeting | null> {
-    const rows = await sql`
+  const rows = await sql`
     UPDATE meetings SET
       date           = ${data.date}::date,
       meeting_type   = ${data.meetingType},
@@ -152,12 +152,12 @@ export async function updateMeeting(
       closing_hymn                AS "closingHymn",
       closing_prayer              AS "closingPrayer"
   `;
-    return (rows[0] as unknown as SacramentMeeting) ?? null;
+  return (rows[0] as unknown as SacramentMeeting) ?? null;
 }
 
 export async function deleteMeeting(id: number): Promise<boolean> {
-    const rows = await sql`
+  const rows = await sql`
     DELETE FROM meetings WHERE id = ${id} RETURNING id
   `;
-    return rows.length > 0;
+  return rows.length > 0;
 }

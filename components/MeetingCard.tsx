@@ -13,7 +13,7 @@ export default function MeetingCard({ meeting }: { meeting: SacramentMeeting }) 
                     </span>
                     <span className="text-sm font-medium text-gray-600">{meeting.date}</span>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mt-2">Sacrament Meeting</h3>
+                <h2 className="text-lg font-semibold text-gray-900 mt-2">Meeting on {meeting.date}</h2>
                 <p className="text-sm text-gray-600 mt-1">
                     <span className="font-medium">Presiding:</span> {meeting.presiding}
                 </p>

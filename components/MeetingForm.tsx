@@ -80,7 +80,7 @@ function Field({
             </label>
 
             {kind === 'select' ? (
-                <select {...common}>
+                <select key={defaultValue} {...common}>
                     <option value="">Select a meeting type</option>
                     {MEETING_TYPES.map((type) => (
                         <option key={type} value={type}>
@@ -89,9 +89,10 @@ function Field({
                     ))}
                 </select>
             ) : kind === 'textarea' ? (
-                <textarea {...common} rows={4} />
+                <textarea key={defaultValue} {...common} rows={4} />
             ) : (
                 <input
+                    key={defaultValue}
                     {...common}
                     type={kind}
                     min={kind === 'number' ? 1 : undefined}

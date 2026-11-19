@@ -10,9 +10,6 @@ import {
 } from '@/lib/meetings-db';
 import { MEETING_TYPES, type SacramentMeeting } from '@/lib/types';
 
-// ---------------------------------------------------------------------------
-// Form field names (must match the `name` attributes in the form component)
-// ---------------------------------------------------------------------------
 const FIELD_NAMES = [
     'date',
     'meetingType',
@@ -31,17 +28,12 @@ const FIELD_NAMES = [
 
 export type FieldName = (typeof FIELD_NAMES)[number];
 
-// State returned to useActionState. `values` lets the form keep what the
-// user typed, because React resets uncontrolled forms after an action runs.
 export type State = {
     message?: string | null;
     errors?: Partial<Record<FieldName, string[]>>;
     values?: Record<FieldName, string>;
 };
 
-// ---------------------------------------------------------------------------
-// Validation schema
-// ---------------------------------------------------------------------------
 function isRealDate(value: string): boolean {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
     if (value < '1900-01-01' || value > '2100-12-31') return false;
@@ -115,9 +107,6 @@ const MeetingFormSchema = z.object({
     closingPrayer: requiredText('Closing prayer', 100),
 });
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
 function readRawValues(formData: FormData): Record<FieldName, string> {
     return Object.fromEntries(
         FIELD_NAMES.map((name) => [name, String(formData.get(name) ?? '')])
@@ -135,9 +124,6 @@ function validationFailure(
     };
 }
 
-// ---------------------------------------------------------------------------
-// Server Actions
-// ---------------------------------------------------------------------------
 export async function createMeeting(
     prevState: State,
     formData: FormData
@@ -156,7 +142,6 @@ export async function createMeeting(
         throw new Error('Failed to create the meeting. Please try again.');
     }
 
-    // redirect() must stay outside try/catch (it works by throwing).
     revalidatePath('/meetings');
     redirect('/meetings');
 }
@@ -194,6 +179,7 @@ export async function updateMeeting(
 
     revalidatePath('/meetings');
     revalidatePath(`/meetings/${id}`);
+    revalidatePath(`/meetings/${id}/edit`);
     redirect('/meetings');
 }
 
@@ -209,7 +195,5 @@ export async function deleteMeeting(id: number): Promise<void> {
         throw new Error('Failed to delete the meeting. Please try again.');
     }
 
-    // No redirect: the delete button lives on /meetings, so revalidating
-    // refreshes the list in place and keeps the user's search and page.
     revalidatePath('/meetings');
 }

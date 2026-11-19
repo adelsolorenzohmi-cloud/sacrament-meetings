@@ -13,13 +13,14 @@ export default function NavLinks() {
     ];
 
     return (
-        <nav className="flex space-x-6">
+        <nav aria-label="Main" className="flex flex-wrap justify-center gap-x-6 gap-y-2">
             {links.map((link) => {
                 const isActive = pathname === link.href;
                 return (
                     <Link
                         key={link.name}
                         href={link.href}
+                        aria-current={isActive ? 'page' : undefined}
                         className={`${isActive ? 'text-blue-600 font-semibold' : 'text-gray-600 hover:text-blue-600'
                             }`}
                     >

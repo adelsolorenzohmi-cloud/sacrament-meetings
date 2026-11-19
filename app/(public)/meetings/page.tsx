@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { getMeetings, getMeetingsTotalPages } from '@/lib/meetings-db';
 import { MeetingSearch } from '@/components/MeetingSearch';
 import MeetingCard from '@/components/MeetingCard';
@@ -9,15 +10,23 @@ export default async function MeetingsPage(props: {
 }) {
     const searchParams = await props.searchParams;
     const query = searchParams?.query ?? '';
-    const currentPage = Number(searchParams?.page) || 1;
+    const rawPage = Number(searchParams?.page);
+    const currentPage = Number.isInteger(rawPage) && rawPage >= 1 ? rawPage : 1;
 
-    const [meetings, totalPages] = await Promise.all([
-        getMeetings(query, currentPage),
-        getMeetingsTotalPages(query),
-    ]);
+    const totalPages = await getMeetingsTotalPages(query);
+
+    if (totalPages > 0 && currentPage > totalPages) {
+        const params = new URLSearchParams({ page: String(totalPages) });
+        if (query) params.set('query', query);
+        redirect(`/meetings?${params.toString()}`);
+    }
+
+    const meetings = await getMeetings(query, currentPage);
 
     return (
         <div className="space-y-6">
+            <h1 className="sr-only">All Meetings</h1>
+
             <div className="flex justify-end">
                 <Link
                     href="/meetings/new"
