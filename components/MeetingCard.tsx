@@ -3,7 +3,13 @@ import { deleteMeeting } from '@/lib/actions';
 import DeleteMeetingButton from '@/components/DeleteMeetingButton';
 import type { SacramentMeeting } from '@/lib/types';
 
-export default function MeetingCard({ meeting }: { meeting: SacramentMeeting }) {
+export default function MeetingCard({
+    meeting,
+    showAdminActions = false,
+}: {
+    meeting: SacramentMeeting;
+    showAdminActions?: boolean;
+}) {
     return (
         <div className="border rounded-lg p-5 shadow-sm hover:shadow-md transition-shadow bg-white flex flex-col justify-between">
             <div>
@@ -23,17 +29,21 @@ export default function MeetingCard({ meeting }: { meeting: SacramentMeeting }) 
             </div>
 
             <div className="mt-4 pt-3 border-t flex items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                    <Link
-                        href={`/meetings/${meeting.id}/edit`}
-                        className="text-sm font-semibold text-gray-700 hover:text-gray-900"
-                    >
-                        Edit<span className="sr-only"> meeting on {meeting.date}</span>
-                    </Link>
-                    <form action={deleteMeeting.bind(null, meeting.id)}>
-                        <DeleteMeetingButton meetingDate={meeting.date} />
-                    </form>
-                </div>
+                {showAdminActions ? (
+                    <div className="flex items-center gap-4">
+                        <Link
+                            href={`/dashboard/meetings/${meeting.id}/edit`}
+                            className="text-sm font-semibold text-gray-700 hover:text-gray-900"
+                        >
+                            Edit<span className="sr-only"> meeting on {meeting.date}</span>
+                        </Link>
+                        <form action={deleteMeeting.bind(null, meeting.id)}>
+                            <DeleteMeetingButton meetingDate={meeting.date} />
+                        </form>
+                    </div>
+                ) : (
+                    <span />
+                )}
                 <Link
                     href={`/meetings/${meeting.id}`}
                     className="text-sm font-semibold text-blue-700 hover:text-blue-900"

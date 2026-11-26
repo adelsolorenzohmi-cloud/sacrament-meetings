@@ -1,0 +1,9 @@
+{
+    "name": "Central Ward Sacrament Meeting Planner",
+    "short_name": "Ward Planner",
+    "description": "View weekly sacrament meeting schedules, hymns, speakers, and ward business for Central Ward.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#f9fafb",
+    "theme_color": "#1d4ed8"
+}

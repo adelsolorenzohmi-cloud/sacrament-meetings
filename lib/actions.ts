@@ -1,8 +1,10 @@
 'use server';
 
 import { z } from 'zod';
+import { AuthError } from 'next-auth';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { auth, signIn } from '@/auth';
 import {
     addMeeting,
     updateMeeting as updateMeetingInDb,
@@ -33,6 +35,37 @@ export type State = {
     errors?: Partial<Record<FieldName, string[]>>;
     values?: Record<FieldName, string>;
 };
+
+async function requireOwnerSession() {
+    const session = await auth();
+    if (!session?.user) {
+        throw new Error('Not authenticated');
+    }
+    return session;
+}
+
+export async function authenticate(
+    prevState: string | undefined,
+    formData: FormData
+): Promise<string | undefined> {
+    try {
+        await signIn('credentials', {
+            email: formData.get('email'),
+            password: formData.get('password'),
+            redirectTo: '/dashboard',
+        });
+    } catch (error) {
+        if (error instanceof AuthError) {
+            switch (error.type) {
+                case 'CredentialsSignin':
+                    return 'Invalid email or password.';
+                default:
+                    return 'Something went wrong while signing in.';
+            }
+        }
+        throw error;
+    }
+}
 
 function isRealDate(value: string): boolean {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
@@ -128,6 +161,8 @@ export async function createMeeting(
     prevState: State,
     formData: FormData
 ): Promise<State> {
+    await requireOwnerSession();
+
     const raw = readRawValues(formData);
     const parsed = MeetingFormSchema.safeParse(raw);
 
@@ -143,7 +178,9 @@ export async function createMeeting(
     }
 
     revalidatePath('/meetings');
-    redirect('/meetings');
+    revalidatePath('/dashboard');
+    revalidatePath('/dashboard/meetings');
+    redirect('/dashboard/meetings');
 }
 
 export async function updateMeeting(
@@ -151,6 +188,8 @@ export async function updateMeeting(
     prevState: State,
     formData: FormData
 ): Promise<State> {
+    await requireOwnerSession();
+
     if (!Number.isInteger(id) || id < 1) {
         return { message: 'Invalid meeting ID.' };
     }
@@ -179,11 +218,15 @@ export async function updateMeeting(
 
     revalidatePath('/meetings');
     revalidatePath(`/meetings/${id}`);
-    revalidatePath(`/meetings/${id}/edit`);
-    redirect('/meetings');
+    revalidatePath('/dashboard');
+    revalidatePath('/dashboard/meetings');
+    revalidatePath(`/dashboard/meetings/${id}/edit`);
+    redirect('/dashboard/meetings');
 }
 
 export async function deleteMeeting(id: number): Promise<void> {
+    await requireOwnerSession();
+
     if (!Number.isInteger(id) || id < 1) {
         throw new Error('Invalid meeting ID.');
     }
@@ -196,4 +239,6 @@ export async function deleteMeeting(id: number): Promise<void> {
     }
 
     revalidatePath('/meetings');
+    revalidatePath('/dashboard');
+    revalidatePath('/dashboard/meetings');
 }

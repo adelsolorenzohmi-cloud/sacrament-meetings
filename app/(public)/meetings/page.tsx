@@ -1,9 +1,14 @@
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import type { Metadata } from 'next';
 import { getMeetings, getMeetingsTotalPages } from '@/lib/meetings-db';
 import { MeetingSearch } from '@/components/MeetingSearch';
 import MeetingCard from '@/components/MeetingCard';
 import { Pagination } from '@/components/Pagination';
+
+export const metadata: Metadata = {
+    title: 'Meetings',
+    description: 'Browse upcoming and past sacrament meeting programs for Central Ward.',
+};
 
 export default async function MeetingsPage(props: {
     searchParams?: Promise<{ query?: string; page?: string }>;
@@ -25,15 +30,13 @@ export default async function MeetingsPage(props: {
 
     return (
         <div className="space-y-6">
-            <h1 className="sr-only">All Meetings</h1>
-
-            <div className="flex justify-end">
-                <Link
-                    href="/meetings/new"
-                    className="rounded-lg bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800"
-                >
-                    New Meeting
-                </Link>
+            <div className="border-b pb-4">
+                <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+                    Sacrament Meetings
+                </h1>
+                <p className="text-sm text-gray-600 mt-1">
+                    Weekly meeting schedules, hymns, speakers, and announcements.
+                </p>
             </div>
 
             <MeetingSearch />
