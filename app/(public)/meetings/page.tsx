@@ -1,5 +1,7 @@
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
+import { auth } from '@/auth';
 import { getMeetings, getMeetingsTotalPages } from '@/lib/meetings-db';
 import { MeetingSearch } from '@/components/MeetingSearch';
 import MeetingCard from '@/components/MeetingCard';
@@ -18,6 +20,10 @@ export default async function MeetingsPage(props: {
     const rawPage = Number(searchParams?.page);
     const currentPage = Number.isInteger(rawPage) && rawPage >= 1 ? rawPage : 1;
 
+    // Signed-in bishopric members see Edit/Delete; everyone else sees a read-only list
+    const session = await auth();
+    const isAdmin = Boolean(session?.user);
+
     const totalPages = await getMeetingsTotalPages(query);
 
     if (totalPages > 0 && currentPage > totalPages) {
@@ -30,14 +36,18 @@ export default async function MeetingsPage(props: {
 
     return (
         <div className="space-y-6">
-            <div className="border-b pb-4">
-                <h1 className="text-2xl font-bold tracking-tight text-gray-900">
-                    Sacrament Meetings
-                </h1>
-                <p className="text-sm text-gray-600 mt-1">
-                    Weekly meeting schedules, hymns, speakers, and announcements.
-                </p>
-            </div>
+            <h1 className="sr-only">All Meetings</h1>
+
+            {isAdmin && (
+                <div className="flex justify-end">
+                    <Link
+                        href="/dashboard/meetings/new"
+                        className="rounded-lg bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800"
+                    >
+                        New Meeting
+                    </Link>
+                </div>
+            )}
 
             <MeetingSearch />
 
@@ -48,7 +58,11 @@ export default async function MeetingsPage(props: {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {meetings.map((meeting) => (
-                        <MeetingCard key={meeting.id} meeting={meeting} />
+                        <MeetingCard
+                            key={meeting.id}
+                            meeting={meeting}
+                            showAdminActions={isAdmin}
+                        />
                     ))}
                 </div>
             )}

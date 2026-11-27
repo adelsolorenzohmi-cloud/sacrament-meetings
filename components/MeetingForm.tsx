@@ -174,7 +174,7 @@ export default function MeetingForm({ action, meeting, submitLabel }: MeetingFor
 
             <div className="flex items-center justify-end gap-3 border-t pt-6">
                 <Link
-                    href="/meetings"
+                    href="/dashboard/meetings"
                     className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
                 >
                     Cancel

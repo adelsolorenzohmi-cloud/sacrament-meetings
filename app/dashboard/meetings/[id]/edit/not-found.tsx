@@ -9,7 +9,7 @@ export default function EditMeetingNotFound() {
                 deleted, or the link may be incorrect.
             </p>
             <Link
-                href="/meetings"
+                href="/dashboard/meetings"
                 className="inline-block rounded-lg bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800"
             >
                 Back to all meetings
